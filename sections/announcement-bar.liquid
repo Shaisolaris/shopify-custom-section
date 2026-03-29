@@ -1,0 +1,72 @@
+{% comment %} Section: Announcement Bar with multiple rotating messages {% endcomment %}
+{%- if section.blocks.size > 0 -%}
+<div
+  class="announcement-bar"
+  style="background-color:{{ section.settings.background_color }};color:{{ section.settings.text_color }};"
+  role="region"
+  aria-label="Announcement"
+>
+  <div class="announcement-bar__inner page-width">
+    {%- if section.blocks.size == 1 -%}
+      {%- for block in section.blocks -%}
+        <div class="announcement-bar__message" {{ block.shopify_attributes }}>
+          {%- if block.settings.icon != blank -%}<span class="announcement-bar__icon">{{ block.settings.icon }}</span>{%- endif -%}
+          {%- if block.settings.url != blank -%}<a href="{{ block.settings.url }}" class="announcement-bar__link">{% endif %}
+          {{ block.settings.message }}
+          {%- if block.settings.url != blank -%}</a>{% endif %}
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="announcement-bar__slider" data-autoplay="{{ section.settings.autoplay }}" data-speed="{{ section.settings.speed | times: 1000 }}">
+        {%- for block in section.blocks -%}
+          <div class="announcement-bar__slide{% if forloop.first %} is-active{% endif %}" {{ block.shopify_attributes }}>
+            {%- if block.settings.icon != blank -%}<span>{{ block.settings.icon }}</span>{%- endif -%}
+            {%- if block.settings.url != blank -%}<a href="{{ block.settings.url }}" class="announcement-bar__link">{% endif %}
+            {{ block.settings.message }}
+            {%- if block.settings.url != blank -%}</a>{% endif %}
+          </div>
+        {%- endfor -%}
+      </div>
+      {%- if section.settings.show_arrows -%}
+        <button class="announcement-bar__prev" aria-label="Previous">&#8249;</button>
+        <button class="announcement-bar__next" aria-label="Next">&#8250;</button>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Announcement Bar",
+  "limit": 1,
+  "settings": [
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#000000" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#ffffff" },
+    { "type": "checkbox", "id": "autoplay", "label": "Auto-rotate", "default": true },
+    { "type": "range", "id": "speed", "label": "Rotation Speed (sec)", "min": 2, "max": 10, "step": 1, "default": 4 },
+    { "type": "checkbox", "id": "show_arrows", "label": "Show Arrows", "default": true }
+  ],
+  "blocks": [
+    {
+      "name": "Message",
+      "type": "message",
+      "settings": [
+        { "type": "text", "id": "icon", "label": "Icon (emoji or text)", "default": "🚚" },
+        { "type": "richtext", "id": "message", "label": "Message", "default": "<p>Free shipping on orders over $50</p>" },
+        { "type": "url", "id": "url", "label": "Link (optional)" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement Bar",
+      "blocks": [
+        { "type": "message", "settings": { "icon": "🚚", "message": "<p>Free shipping on orders over $50</p>" } },
+        { "type": "message", "settings": { "icon": "🔄", "message": "<p>30-day hassle-free returns</p>" } },
+        { "type": "message", "settings": { "icon": "💬", "message": "<p>24/7 customer support available</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

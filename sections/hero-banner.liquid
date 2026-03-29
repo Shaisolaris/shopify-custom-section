@@ -1,0 +1,298 @@
+{% comment %}
+  Section: Hero Banner Pro
+  Full-featured hero with video background, split layout option,
+  animated text, countdown timer, and metafield support.
+{% endcomment %}
+
+{%- liquid
+  assign section_id = 'hero-' | append: section.id
+  assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+-%}
+
+<section
+  id="{{ section_id }}"
+  class="hero-banner hero-banner--{{ section.settings.layout }} hero-banner--height-{{ section.settings.height }}"
+  data-section-id="{{ section.id }}"
+  data-section-type="hero-banner"
+>
+  {%- if section.settings.video_url != blank -%}
+    <div class="hero-banner__video-wrap" aria-hidden="true">
+      <video
+        class="hero-banner__video"
+        autoplay
+        muted
+        loop
+        playsinline
+        poster="{{ section.settings.image | image_url: width: 1920 }}"
+      >
+        <source src="{{ section.settings.video_url }}" type="video/mp4">
+      </video>
+    </div>
+  {%- elsif section.settings.image != blank -%}
+    <div class="hero-banner__image-wrap">
+      {{
+        section.settings.image
+        | image_url: width: 1920
+        | image_tag:
+          loading: 'eager',
+          fetchpriority: 'high',
+          class: 'hero-banner__image',
+          widths: '375, 750, 1100, 1500, 1780, 1920',
+          sizes: '100vw'
+      }}
+    </div>
+  {%- endif -%}
+
+  <div
+    class="hero-banner__overlay"
+    style="background-color: {{ section.settings.overlay_color }}; opacity: {{ overlay_opacity }};"
+    aria-hidden="true"
+  ></div>
+
+  <div class="hero-banner__content-wrap page-width">
+    <div class="hero-banner__content hero-banner__content--{{ section.settings.content_alignment }}">
+
+      {%- if section.settings.subheading != blank -%}
+        <p class="hero-banner__subheading animate-in" data-animate="fade-up" data-delay="0">
+          {{- section.settings.subheading | escape -}}
+        </p>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <{{ section.settings.heading_tag }} class="hero-banner__heading animate-in" data-animate="fade-up" data-delay="100">
+          {{- section.settings.heading -}}
+        </{{ section.settings.heading_tag }}>
+      {%- endif -%}
+
+      {%- if section.settings.body != blank -%}
+        <div class="hero-banner__body rte animate-in" data-animate="fade-up" data-delay="200">
+          {{- section.settings.body -}}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.countdown_date != blank -%}
+        <div
+          class="hero-banner__countdown animate-in"
+          data-animate="fade-up"
+          data-delay="250"
+          data-countdown="{{ section.settings.countdown_date }}"
+        >
+          <div class="countdown__item"><span class="countdown__num" data-days>00</span><span class="countdown__label">Days</span></div>
+          <div class="countdown__item"><span class="countdown__num" data-hours>00</span><span class="countdown__label">Hours</span></div>
+          <div class="countdown__item"><span class="countdown__num" data-minutes>00</span><span class="countdown__label">Mins</span></div>
+          <div class="countdown__item"><span class="countdown__num" data-seconds>00</span><span class="countdown__label">Secs</span></div>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.button_label != blank or section.settings.button_label_2 != blank -%}
+        <div class="hero-banner__buttons animate-in" data-animate="fade-up" data-delay="300">
+          {%- if section.settings.button_label != blank -%}
+            <a
+              href="{{ section.settings.button_link }}"
+              class="button button--{{ section.settings.button_style }}"
+              {%- if section.settings.button_link == blank %} role="link" aria-disabled="true"{%- endif -%}
+            >
+              {{- section.settings.button_label | escape -}}
+            </a>
+          {%- endif -%}
+          {%- if section.settings.button_label_2 != blank -%}
+            <a
+              href="{{ section.settings.button_link_2 }}"
+              class="button button--{{ section.settings.button_style_2 }}"
+            >
+              {{- section.settings.button_label_2 | escape -}}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+    </div>
+
+    {%- if section.settings.layout == 'split' and section.settings.split_image != blank -%}
+      <div class="hero-banner__split-image animate-in" data-animate="fade-left" data-delay="200">
+        {{
+          section.settings.split_image
+          | image_url: width: 800
+          | image_tag:
+            loading: 'eager',
+            widths: '400, 600, 800',
+            sizes: '(min-width: 990px) 45vw, 100vw'
+        }}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero Banner Pro",
+  "tag": "section",
+  "class": "section-hero-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "full", "label": "Full Width" },
+        { "value": "split", "label": "Split (text + image)" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Height",
+      "options": [
+        { "value": "small",  "label": "Small (50vh)" },
+        { "value": "medium", "label": "Medium (70vh)" },
+        { "value": "large",  "label": "Large (90vh)" },
+        { "value": "full",   "label": "Full Screen" }
+      ],
+      "default": "large"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content Alignment",
+      "options": [
+        { "value": "left",   "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right",  "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "split_image",
+      "label": "Split Layout Image"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Video URL (MP4, overrides image)"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay Opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>Welcome to Our Store</p>"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading Tag",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body Text"
+    },
+    {
+      "type": "text",
+      "id": "countdown_date",
+      "label": "Countdown Date (ISO 8601)",
+      "info": "Example: 2025-12-31T00:00:00"
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Primary Button Label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Primary Button Link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Primary Button Style",
+      "options": [
+        { "value": "primary",   "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" },
+        { "value": "outline",   "label": "Outline" }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "text",
+      "id": "button_label_2",
+      "label": "Secondary Button Label"
+    },
+    {
+      "type": "url",
+      "id": "button_link_2",
+      "label": "Secondary Button Link"
+    },
+    {
+      "type": "select",
+      "id": "button_style_2",
+      "label": "Secondary Button Style",
+      "options": [
+        { "value": "primary",   "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" },
+        { "value": "outline",   "label": "Outline" }
+      ],
+      "default": "outline"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner Pro",
+      "settings": {
+        "heading": "<p>Bold Heading That Converts</p>",
+        "button_label": "Shop Now",
+        "button_link": "/collections/all"
+      }
+    }
+  ]
+}
+{% endschema %}

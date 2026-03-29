@@ -1,0 +1,307 @@
+{% comment %}
+  Section: Featured Collection Pro
+  Displays products from a selected collection with client-side tag filtering,
+  quick-add to cart, product badges, and load more pagination.
+{% endcomment %}
+
+{%- liquid
+  assign collection = section.settings.collection
+  assign products_per_row = section.settings.products_per_row
+  assign products_to_show = section.settings.products_to_show
+  assign enable_filtering = section.settings.enable_filtering
+-%}
+
+<section
+  id="featured-collection-{{ section.id }}"
+  class="featured-collection page-width section-{{ section.id }}-padding"
+  data-section-id="{{ section.id }}"
+>
+
+  <div class="featured-collection__header">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="featured-collection__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.description != blank -%}
+      <p class="featured-collection__description">{{ section.settings.description | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.view_all_label != blank and collection != blank -%}
+      <a href="{{ collection.url }}" class="featured-collection__view-all link">
+        {{ section.settings.view_all_label | escape }}
+        {%- render 'icon-arrow' -%}
+      </a>
+    {%- endif -%}
+  </div>
+
+  {%- if enable_filtering and collection != blank and collection.all_tags.size > 0 -%}
+    <div class="featured-collection__filters" role="list" aria-label="{{ 'sections.collection.filter_by' | t }}">
+      <button
+        class="filter-btn filter-btn--active"
+        data-filter="*"
+        aria-pressed="true"
+      >
+        {{ 'sections.collection.all' | t | default: 'All' }}
+      </button>
+      {%- for tag in collection.all_tags -%}
+        <button
+          class="filter-btn"
+          data-filter="{{ tag | handleize }}"
+          aria-pressed="false"
+        >
+          {{ tag }}
+        </button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+
+  {%- if collection == blank or collection.products.size == 0 -%}
+    <div class="featured-collection__empty">
+      <p>{{ 'sections.collection.empty' | t | default: 'No products found.' }}</p>
+    </div>
+  {%- else -%}
+    <ul
+      class="featured-collection__grid product-grid columns-{{ products_per_row }}"
+      role="list"
+      id="product-grid-{{ section.id }}"
+    >
+      {%- for product in collection.products limit: products_to_show -%}
+        {%- liquid
+          assign tags_handles = product.tags | map: 'handleize' | join: ' '
+          assign card_id = 'product-card-' | append: section.id | append: '-' | append: forloop.index
+        -%}
+        <li
+          class="product-card-wrapper"
+          data-tags="{{ tags_handles }}"
+          id="{{ card_id }}"
+        >
+          <div class="product-card{% if section.settings.card_style == 'bordered' %} product-card--bordered{% endif %}">
+
+            <div class="product-card__media">
+              <a href="{{ product.url }}" class="product-card__media-link" tabindex="-1" aria-hidden="true">
+                {%- if product.featured_media -%}
+                  {{
+                    product.featured_media
+                    | image_url: width: 600
+                    | image_tag:
+                      loading: 'lazy',
+                      widths: '165, 360, 533, 720',
+                      sizes: '(min-width: 1100px) calc((100vw - 130px) / ' | append: products_per_row | append: '), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)',
+                      class: 'product-card__image'
+                  }}
+                  {%- if product.images[1] and section.settings.show_secondary_image -%}
+                    {{
+                      product.images[1]
+                      | image_url: width: 600
+                      | image_tag:
+                        loading: 'lazy',
+                        widths: '165, 360, 533, 720',
+                        class: 'product-card__image product-card__image--hover'
+                    }}
+                  {%- endif -%}
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg product-card__image' }}
+                {%- endif -%}
+              </a>
+
+              {%- comment -%} Badges {%- endcomment -%}
+              <div class="product-card__badges">
+                {%- if product.available == false -%}
+                  <span class="badge badge--sold-out">{{ 'products.product.sold_out' | t | default: 'Sold Out' }}</span>
+                {%- elsif product.compare_at_price > product.price -%}
+                  {%- assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+                  <span class="badge badge--sale">-{{ discount }}%</span>
+                {%- elsif product.tags contains 'new' -%}
+                  <span class="badge badge--new">{{ 'products.product.new' | t | default: 'New' }}</span>
+                {%- endif -%}
+              </div>
+
+              {%- if section.settings.enable_quick_add and product.available -%}
+                <div class="product-card__quick-add">
+                  {%- if product.variants.size == 1 -%}
+                    <button
+                      class="quick-add-btn button button--primary"
+                      data-product-id="{{ product.variants.first.id }}"
+                      aria-label="{{ 'products.product.add_to_cart' | t | default: 'Add to cart' }}: {{ product.title | escape }}"
+                    >
+                      {{ 'products.product.add_to_cart' | t | default: 'Add to Cart' }}
+                    </button>
+                  {%- else -%}
+                    <a href="{{ product.url }}" class="quick-add-btn button button--secondary">
+                      {{ 'products.product.choose_options' | t | default: 'Choose Options' }}
+                    </a>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </div>
+
+            <div class="product-card__info">
+              {%- if section.settings.show_vendor -%}
+                <p class="product-card__vendor">{{ product.vendor }}</p>
+              {%- endif -%}
+              <a href="{{ product.url }}" class="product-card__title link link--text">
+                {{ product.title | escape }}
+              </a>
+              {%- if section.settings.show_rating and product.metafields.reviews.rating.value != blank -%}
+                <div class="product-card__rating" aria-label="{{ product.metafields.reviews.rating.value | round: 1 }} out of 5 stars">
+                  {%- render 'star-rating', rating: product.metafields.reviews.rating.value -%}
+                  {%- if product.metafields.reviews.rating_count.value -%}
+                    <span class="product-card__rating-count">({{ product.metafields.reviews.rating_count.value }})</span>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+              <div class="product-card__price">
+                {%- render 'price', product: product, show_compare_at_price: true -%}
+              </div>
+            </div>
+          </div>
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- if section.settings.show_load_more and collection.products.size > products_to_show -%}
+      <div class="featured-collection__load-more">
+        <button
+          class="button button--secondary load-more-btn"
+          data-collection="{{ collection.handle }}"
+          data-loaded="{{ products_to_show }}"
+          data-per-row="{{ products_per_row }}"
+        >
+          {{ 'sections.collection.load_more' | t | default: 'Load More' }}
+        </button>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
+</section>
+
+<style>
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Featured Collection Pro",
+  "tag": "section",
+  "class": "section-featured-collection",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured Products"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "View All Label",
+      "default": "View All"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to Show",
+      "min": 4,
+      "max": 24,
+      "step": 4,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "products_per_row",
+      "label": "Products per Row",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Card Style",
+      "options": [
+        { "value": "standard", "label": "Standard" },
+        { "value": "bordered", "label": "Bordered" }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show Second Image on Hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show Rating (requires Reviews metafields)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_quick_add",
+      "label": "Enable Quick Add",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "Enable Tag Filtering",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_load_more",
+      "label": "Show Load More Button",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Collection Pro"
+    }
+  ]
+}
+{% endschema %}

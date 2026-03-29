@@ -1,0 +1,72 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Shopify Custom Sections",
+    "theme_version": "2.0.0",
+    "theme_author": "Shai Solaris",
+    "theme_documentation_url": "https://github.com/Shaisolaris/shopify-custom-section",
+    "theme_support_url": "https://github.com/Shaisolaris/shopify-custom-section/issues"
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      { "type": "color", "id": "color_primary", "label": "Primary", "default": "#000000" },
+      { "type": "color", "id": "color_secondary", "label": "Secondary", "default": "#ffffff" },
+      { "type": "color", "id": "color_accent", "label": "Accent", "default": "#e94560" },
+      { "type": "color", "id": "color_text", "label": "Body Text", "default": "#1a1a1a" },
+      { "type": "color", "id": "color_border", "label": "Border", "default": "#e5e7eb" },
+      { "type": "color", "id": "color_background", "label": "Background", "default": "#ffffff" },
+      { "type": "color", "id": "color_background_alt", "label": "Alt Background", "default": "#f9fafb" }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      { "type": "font_picker", "id": "font_heading", "label": "Heading Font", "default": "helvetica_n4" },
+      { "type": "font_picker", "id": "font_body", "label": "Body Font", "default": "helvetica_n4" },
+      { "type": "range", "id": "font_body_size", "label": "Body Font Size", "min": 12, "max": 18, "step": 1, "unit": "px", "default": 16 }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      { "type": "range", "id": "page_width", "label": "Page Width", "min": 1000, "max": 1440, "step": 20, "unit": "px", "default": 1200 },
+      { "type": "range", "id": "spacing_sections", "label": "Section Spacing", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 0 }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "Cart Type",
+        "options": [
+          { "value": "page", "label": "Page" },
+          { "value": "drawer", "label": "Drawer" }
+        ],
+        "default": "drawer"
+      },
+      { "type": "checkbox", "id": "cart_show_vendor", "label": "Show Vendor in Cart", "default": false },
+      { "type": "checkbox", "id": "currency_code_enabled", "label": "Show Currency Code", "default": false }
+    ]
+  },
+  {
+    "name": "Product Cards",
+    "settings": [
+      {
+        "type": "select",
+        "id": "card_image_ratio",
+        "label": "Image Ratio",
+        "options": [
+          { "value": "adapt",    "label": "Adapt to Image" },
+          { "value": "portrait", "label": "Portrait (2:3)" },
+          { "value": "square",   "label": "Square (1:1)" }
+        ],
+        "default": "adapt"
+      },
+      { "type": "checkbox", "id": "card_show_secondary_image", "label": "Show Hover Image", "default": true },
+      { "type": "checkbox", "id": "card_show_vendor", "label": "Show Vendor", "default": false }
+    ]
+  }
+]

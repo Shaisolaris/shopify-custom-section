@@ -1,0 +1,288 @@
+{% comment %}
+  Section: Image with Text Pro
+  Flexible split section — image left or right, multiple content blocks,
+  custom aspect ratios, animations, and metafield support.
+{% endcomment %}
+
+{%- liquid
+  assign img_position = section.settings.image_position
+  assign img_width = section.settings.image_width
+-%}
+
+<section
+  id="image-with-text-{{ section.id }}"
+  class="image-with-text image-with-text--{{ img_position }} section-{{ section.id }}-padding"
+  data-section-id="{{ section.id }}"
+>
+  <div class="image-with-text__grid page-width" style="--img-width: {{ img_width }}%;">
+
+    <div class="image-with-text__media image-with-text__media--{{ section.settings.image_ratio }}">
+      {%- if section.settings.image != blank -%}
+        {{
+          section.settings.image
+          | image_url: width: 1200
+          | image_tag:
+            loading: 'lazy',
+            widths: '375, 550, 750, 900, 1100',
+            sizes: '(min-width: 990px) ' | append: img_width | append: 'vw, 100vw',
+            class: 'image-with-text__image'
+        }}
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg image-with-text__image' }}
+      {%- endif -%}
+      {%- if section.settings.video_url != blank -%}
+        <button
+          class="image-with-text__play-btn"
+          data-video="{{ section.settings.video_url }}"
+          aria-label="Play video"
+        >
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <circle cx="32" cy="32" r="32" fill="rgba(255,255,255,0.9)"/>
+            <path d="M26 22L46 32L26 42V22Z" fill="#000"/>
+          </svg>
+        </button>
+      {%- endif -%}
+    </div>
+
+    <div class="image-with-text__content image-with-text__content--{{ section.settings.content_alignment }}">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+
+          {%- when 'eyebrow' -%}
+            <p class="image-with-text__eyebrow" {{ block.shopify_attributes }}>
+              {{- block.settings.text | escape -}}
+            </p>
+
+          {%- when 'heading' -%}
+            <{{ block.settings.heading_size }} class="image-with-text__heading" {{ block.shopify_attributes }}>
+              {{- block.settings.heading -}}
+            </{{ block.settings.heading_size }}>
+
+          {%- when 'text' -%}
+            <div class="image-with-text__text rte" {{ block.shopify_attributes }}>
+              {{- block.settings.text -}}
+            </div>
+
+          {%- when 'button' -%}
+            <div class="image-with-text__buttons" {{ block.shopify_attributes }}>
+              {%- if block.settings.button_label != blank -%}
+                <a
+                  href="{{ block.settings.button_link }}"
+                  class="button button--{{ block.settings.button_style }}"
+                >
+                  {{- block.settings.button_label | escape -}}
+                </a>
+              {%- endif -%}
+            </div>
+
+          {%- when 'feature_list' -%}
+            <ul class="image-with-text__features" {{ block.shopify_attributes }}>
+              {%- assign items = block.settings.features | newline_to_br | split: '<br />' -%}
+              {%- for item in items -%}
+                {%- unless item == blank -%}
+                  <li class="image-with-text__feature-item">
+                    <span class="image-with-text__feature-icon" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    {{ item | strip | escape }}
+                  </li>
+                {%- endunless -%}
+              {%- endfor -%}
+            </ul>
+
+          {%- when 'stats' -%}
+            <div class="image-with-text__stats" {{ block.shopify_attributes }}>
+              {%- if block.settings.stat_1_number != blank -%}
+                <div class="stat"><span class="stat__number">{{ block.settings.stat_1_number }}</span><span class="stat__label">{{ block.settings.stat_1_label }}</span></div>
+              {%- endif -%}
+              {%- if block.settings.stat_2_number != blank -%}
+                <div class="stat"><span class="stat__number">{{ block.settings.stat_2_number }}</span><span class="stat__label">{{ block.settings.stat_2_label }}</span></div>
+              {%- endif -%}
+              {%- if block.settings.stat_3_number != blank -%}
+                <div class="stat"><span class="stat__number">{{ block.settings.stat_3_number }}</span><span class="stat__label">{{ block.settings.stat_3_label }}</span></div>
+              {%- endif -%}
+            </div>
+
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Image with Text Pro",
+  "tag": "section",
+  "class": "section-image-with-text",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Video URL (adds play button overlay)"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Position",
+      "options": [
+        { "value": "left",  "label": "Image Left" },
+        { "value": "right", "label": "Image Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image Aspect Ratio",
+      "options": [
+        { "value": "adapt",   "label": "Adapt to Image" },
+        { "value": "square",  "label": "Square (1:1)" },
+        { "value": "portrait","label": "Portrait (2:3)" },
+        { "value": "wide",    "label": "Wide (16:9)" }
+      ],
+      "default": "adapt"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "Image Width",
+      "min": 30,
+      "max": 70,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content Alignment",
+      "options": [
+        { "value": "left",   "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 0, "max": 100, "step": 4, "unit": "px",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Eyebrow",
+      "type": "eyebrow",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "text", "label": "Eyebrow Text", "default": "About Us" }
+      ]
+    },
+    {
+      "name": "Heading",
+      "type": "heading",
+      "limit": 1,
+      "settings": [
+        { "type": "richtext", "id": "heading", "label": "Heading", "default": "<p>Built for the Modern Customer</p>" },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Heading Size",
+          "options": [
+            { "value": "h1", "label": "H1" },
+            { "value": "h2", "label": "H2" },
+            { "value": "h3", "label": "H3" }
+          ],
+          "default": "h2"
+        }
+      ]
+    },
+    {
+      "name": "Text",
+      "type": "text",
+      "limit": 2,
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Tell your brand story here. Focus on what makes you different.</p>" }
+      ]
+    },
+    {
+      "name": "Button",
+      "type": "button",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "button_label", "label": "Label", "default": "Learn More" },
+        { "type": "url",  "id": "button_link",  "label": "Link" },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Style",
+          "options": [
+            { "value": "primary",   "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" },
+            { "value": "outline",   "label": "Outline" }
+          ],
+          "default": "primary"
+        }
+      ]
+    },
+    {
+      "name": "Feature List",
+      "type": "feature_list",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "features",
+          "label": "Features (one per line)",
+          "default": "Free shipping on all orders\n30-day return policy\n24\/7 customer support"
+        }
+      ]
+    },
+    {
+      "name": "Stats",
+      "type": "stats",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "stat_1_number", "label": "Stat 1 Number", "default": "50K+" },
+        { "type": "text", "id": "stat_1_label",  "label": "Stat 1 Label",  "default": "Happy Customers" },
+        { "type": "text", "id": "stat_2_number", "label": "Stat 2 Number", "default": "99%" },
+        { "type": "text", "id": "stat_2_label",  "label": "Stat 2 Label",  "default": "Satisfaction Rate" },
+        { "type": "text", "id": "stat_3_number", "label": "Stat 3 Number", "default": "5★" },
+        { "type": "text", "id": "stat_3_label",  "label": "Stat 3 Label",  "default": "Average Rating" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image with Text Pro",
+      "blocks": [
+        { "type": "eyebrow" },
+        { "type": "heading" },
+        { "type": "text" },
+        { "type": "button" }
+      ]
+    }
+  ]
+}
+{% endschema %}
