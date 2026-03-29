@@ -1,0 +1,26 @@
+{
+  "general": {
+    "close": "Close",
+    "loading": "Loading..."
+  },
+  "sections": {
+    "collection": {
+      "all": "All",
+      "empty": "No products found.",
+      "filter_by": "Filter by",
+      "load_more": "Load More"
+    }
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to Cart",
+      "choose_options": "Choose Options",
+      "sold_out": "Sold Out",
+      "new": "New",
+      "price": {
+        "regular_price": "Regular price",
+        "sale_price": "Sale price"
+      }
+    }
+  }
+}
