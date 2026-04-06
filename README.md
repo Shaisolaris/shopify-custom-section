@@ -1,5 +1,14 @@
 # Shopify Custom Sections
 
+
+## Quick Start
+
+```bash
+git clone https://github.com/Shaisolaris/shopify-custom-section.git
+cd shopify-custom-section
+shopify theme dev --store=your-store.myshopify.com
+```
+
 Production-grade Shopify Online Store 2.0 custom sections built for real client projects. Each section is fully configurable via the theme editor with no code required, supports all metafield types, and is built to Shopify's section schema standards.
 
 ## Sections

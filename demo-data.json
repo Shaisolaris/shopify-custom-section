@@ -1,0 +1,11 @@
+{
+  "demo_products": [
+    {"title": "Sample T-Shirt", "price": "29.99", "vendor": "Demo Store"},
+    {"title": "Sample Hoodie", "price": "59.99", "vendor": "Demo Store"},
+    {"title": "Sample Cap", "price": "19.99", "vendor": "Demo Store"}
+  ],
+  "demo_collections": [
+    {"title": "Featured", "products_count": 6},
+    {"title": "New Arrivals", "products_count": 4}
+  ]
+}
