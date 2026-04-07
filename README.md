@@ -1,6 +1,9 @@
 # Shopify Custom Sections
 
 
+
+Shopify OS 2.0 custom sections collection with dynamic blocks, metafield support, and theme editor integration.
+
 ## Quick Start
 
 ```bash
